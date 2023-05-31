@@ -1,0 +1,8 @@
+port: "8080"
+database :
+  username: "your database username"
+  password: "your database password"
+  host: "your database host"
+  port: "3306"
+  name: "your database name"
+jwtsecret: "@Secret123"
