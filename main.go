@@ -1,13 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/app/config"
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/app/database"
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/app/dependency"
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/app/dependency/container"
@@ -23,7 +21,7 @@ func main() {
 		signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 		r.RegisterRoutes()
 		go func() {
-			if err := d.Echo.Start(fmt.Sprintf(":%v", config.Port)); err != nil {
+			if err := d.Echo.Start(":80"); err != nil {
 				d.Logger.Panic("Failed to start server")
 				sigChan <- syscall.SIGTERM
 			}
