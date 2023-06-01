@@ -1,4 +1,5 @@
 name: otomasi deploy server
+
 on: 
   push:
     branches:
@@ -42,4 +43,11 @@ jobs:
           docker rm ${{ secrets.CNAME }}
           docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/be-app:latest
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/be-app:latest
-          docker run -d -p 80:80 -e Username=${{ secrets.DBUSER }} -e Password=${{ secrets.DBPASSWORD }} -e Host=${{ secrets.DBHOST }} -e Port=${{ secrets.DBPORT }} -e Name=${{ secrets.DBNAME }} -e JWTSecret=${{ secrets.JWT_KEY }} ${{ secrets.DOCKERHUB_USERNAME }}/be-app:latest
+          docker run -d -p 80:80 \
+              -e Username=${{ secrets.DB_USERNAME }} \
+              -e Password=${{ secrets.DB_PASSWORD }} \
+              -e Host=${{ secrets.DB_HOST }} \
+              -e Port=${{ secrets.DB_PORT }} \
+              -e Name=${{ secrets.DB_NAME }} \
+              -e JWTSecret=${{ secrets.JWT_SECRET }} \
+              ${{ secrets.DOCKERHUB_USERNAME }}/be-app:latest

@@ -368,7 +368,7 @@ func TestRegister(t *testing.T) {
 			Password: "",
 		}
 
-		err := validation.Authenticate(validation.UserValidate("register", request))
+		_, err := validation.UserValidate("register", request)
 		assert.Error(t, err, "Expected validation error")
 
 		expectedErr := errors.New("Key: 'Register.Password' Error:Field validation for 'Password' failed on the 'required' tag")

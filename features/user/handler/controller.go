@@ -38,6 +38,9 @@ func (uh *UserHandler) Register() echo.HandlerFunc {
 			if strings.Contains(err.Error(), "empty") {
 				return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Username, email, and password cannot be empty.", nil))
 			}
+			if strings.Contains(err.Error(), "email") {
+				return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Invalid email format", nil))
+			}
 			if strings.Contains(err.Error(), "low password") {
 				return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Low strength password, at least 60%", nil))
 			}

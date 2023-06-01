@@ -8,18 +8,15 @@ import (
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/user"
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/helper"
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/helper/validation"
-	"github.com/go-playground/validator/v10"
 )
 
 type Service struct {
-	query    user.UserData
-	validate *validator.Validate
+	query user.UserData
 }
 
 func New(ud user.UserData) user.UserService {
 	return &Service{
-		query:    ud,
-		validate: validator.New(),
+		query: ud,
 	}
 }
 
@@ -28,8 +25,11 @@ func (s *Service) Register(request user.Core) (user.Core, error) {
 		return user.Core{}, errors.New("username, email, and password cannot be empty")
 	}
 
-	err := validation.Authenticate(validation.UserValidate("register", request))
+	_, err := validation.UserValidate("register", request)
 	if err != nil {
+		if strings.Contains(err.Error(), "email") {
+			return user.Core{}, errors.New("invalid email format")
+		}
 		return user.Core{}, errors.New("check password strength, low password")
 	}
 

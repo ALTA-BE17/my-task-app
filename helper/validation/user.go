@@ -1,80 +1,126 @@
 package validation
 
 import (
-	"errors"
 	"fmt"
+	"log"
 
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/user"
 	"github.com/go-playground/validator/v10"
-	pv "github.com/wagslane/go-password-validator"
 )
 
 type Register struct {
 	Name     string `validate:"required"`
-	Password string `validate:"required,passwordValidator"`
+	Email    string `validate:"required,email"`
+	Password string `validate:"required,strongPassword"`
 }
 
 type Login struct {
-	Name     string
-	Password string
+	Name     string `validate:"required"`
+	Password string `validate:"required"`
 }
 
-func UserValidate(option string, data interface{}) interface{} {
+func UserValidate(option string, data interface{}) (interface{}, error) {
 	switch option {
 	case "register":
 		res := Register{}
 		if v, ok := data.(user.Core); ok {
 			res.Name = v.Name
+			res.Email = v.Email
 			res.Password = v.Password
 		}
-		return res
+		err := Authenticate(res)
+		if err != nil {
+			return nil, err
+		}
+		return res, nil
 	case "login":
 		res := Login{}
 		if v, ok := data.(Login); ok {
 			res.Name = v.Name
 			res.Password = v.Password
 		}
-		return res
+		err := Authenticate(res)
+		if err != nil {
+			return nil, err
+		}
+		return res, nil
 	default:
-		return nil
+		return nil, fmt.Errorf("invalid option")
 	}
-}
-
-func PasswordValidator(fl validator.FieldLevel) bool {
-	password := fl.Field().String()
-	entropy := pv.GetEntropy(password)
-	fmt.Printf("Entropy: %.2f bits\n", entropy)
-
-	const minEntropyBits = 60
-	err := pv.Validate(password, minEntropyBits)
-
-	return err == nil
 }
 
 func Authenticate(data interface{}) error {
 	validate := validator.New()
-	err := validate.RegisterValidation("passwordValidator", PasswordValidator)
+	err := validate.RegisterValidation("strongPassword", StrongPassword)
 	if err != nil {
 		return err
 	}
 
-	err1 := validate.Struct(data)
-	if err1 != nil {
-		return err1
+	err = validate.Struct(data)
+	if err != nil {
+		return err
 	}
 	return nil
 }
 
 func UpdatePasswordValidator(password string) error {
-	entropy := pv.GetEntropy(password)
-	fmt.Printf("Entropy: %.2f bits\n", entropy)
+	minChars := strongPassword(password)
+	if minChars > 0 {
+		return fmt.Errorf("password strength is low, minimum %d characters need to be added", minChars)
+	}
+	return nil
+}
 
-	const minEntropyBits = 60
-	err := pv.Validate(password, minEntropyBits)
+func StrongPassword(fl validator.FieldLevel) bool {
+	password := fl.Field().String()
+	minChars := strongPassword(password)
+	if minChars > 0 {
+		log.Printf("Password strength is low. Minimum %d characters need to be added.", minChars)
+		return false
+	}
+	return true
+}
 
-	if err != nil {
-		return errors.New("password strength is low")
+func strongPassword(password string) uint32 {
+	hasDigit := false
+	hasLower := false
+	hasUpper := false
+	hasSpecial := false
+	toAdd := 0
+
+	for i := 0; i < len(password); i++ {
+		val := uint32(password[i])
+		if val >= 65 && val <= 90 {
+			hasUpper = true
+		}
+		if val >= 97 && val <= 122 {
+			hasLower = true
+		}
+		if val >= 48 && val <= 57 {
+			hasDigit = true
+		}
+		if val >= 33 && val <= 45 {
+			hasSpecial = true
+		}
 	}
 
-	return nil
+	if !hasUpper {
+		toAdd++
+	}
+	if !hasLower {
+		toAdd++
+	}
+	if !hasDigit {
+		toAdd++
+	}
+	if !hasSpecial {
+		toAdd++
+	}
+
+	addedLen := len(password) + toAdd
+	if addedLen > 6 {
+		return uint32(toAdd)
+	}
+
+	return uint32(6 - addedLen + toAdd)
 }
