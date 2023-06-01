@@ -44,10 +44,10 @@ jobs:
           docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/be-app:latest
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/be-app:latest
           docker run -d -p 80:80 \
-              -e Username=${{ secrets.DB_USERNAME }} \
-              -e Password=${{ secrets.DB_PASSWORD }} \
-              -e Host=${{ secrets.DB_HOST }} \
-              -e Port=${{ secrets.DB_PORT }} \
-              -e Name=${{ secrets.DB_NAME }} \
-              -e JWTSecret=${{ secrets.JWT_SECRET }} \
+              -e dbusername=${{ secrets.DB_USERNAME }} \
+              -e dbpassword=${{ secrets.DB_PASSWORD }} \
+              -e dbhost=${{ secrets.DB_HOST }} \
+              -e dbport=${{ secrets.DB_PORT }} \
+              -e dbname=${{ secrets.DB_NAME }} \
+              -e jwtsecret=${{ secrets.JWT_SECRET }} \
               ${{ secrets.DOCKERHUB_USERNAME }}/be-app:latest

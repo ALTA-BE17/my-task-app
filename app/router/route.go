@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/app/config"
 	dep "github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/app/dependency"
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/book"
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/user"
@@ -49,12 +50,12 @@ func (r *Routes) RegisterRoutes() {
 	e.POST("/register", r.User.Register())
 	e.POST("/login", r.User.Login())
 	e.GET("/users/books", r.User.GetAllUsers())
-	e.GET("/users", r.User.Profile(), jwt.JWT([]byte(r.Dep.Config.JWTSecret)))
-	e.GET("/users/search", r.User.SearchUsers(), jwt.JWT([]byte(r.Dep.Config.JWTSecret)))
-	e.PUT("/users", r.User.UpdateProfile(), jwt.JWT([]byte(r.Dep.Config.JWTSecret)))
-	e.DELETE("/users", r.User.Deactive(), jwt.JWT([]byte(r.Dep.Config.JWTSecret)))
+	e.GET("/users", r.User.Profile(), jwt.JWT([]byte(config.JWTSecret)))
+	e.GET("/users/search", r.User.SearchUsers(), jwt.JWT([]byte(config.JWTSecret)))
+	e.PUT("/users", r.User.UpdateProfile(), jwt.JWT([]byte(config.JWTSecret)))
+	e.DELETE("/users", r.User.Deactive(), jwt.JWT([]byte(config.JWTSecret)))
 
 	e.GET("/books", r.Book.ListBooks())
-	e.POST("/books", r.Book.InsertBook(), jwt.JWT([]byte(r.Dep.Config.JWTSecret)))
-	e.PUT("/books/:id", r.Book.UpdateBook(), jwt.JWT([]byte(r.Dep.Config.JWTSecret)))
+	e.POST("/books", r.Book.InsertBook(), jwt.JWT([]byte(config.JWTSecret)))
+	e.PUT("/books/:id", r.Book.UpdateBook(), jwt.JWT([]byte(config.JWTSecret)))
 }

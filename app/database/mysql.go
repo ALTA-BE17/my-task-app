@@ -10,7 +10,7 @@ import (
 
 func InitDatabase(config *config.AppConfig) *gorm.DB {
 	dsn := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?charset=utf8&parseTime=True&loc=Local",
-		config.Database.DB_USERNAME, config.Database.DB_PASSWORD, config.Database.DB_HOST, config.Database.DB_PORT, config.Database.DB_NAME,
+		config.DB_USERNAME, config.DB_PASSWORD, config.DB_HOST, config.DB_PORT, config.DB_NAME,
 	)
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
