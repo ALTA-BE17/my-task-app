@@ -1,79 +1,42 @@
 package handler
 
 import (
-	"time"
-
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/user"
+	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/helper"
 )
 
 type SearchUsersResponse struct {
-	ID        uint      `json:"id"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	Username  string           `json:"username"`
+	Phone     string           `json:"phone"`
+	Email     string           `json:"email"`
+	CreatedAt helper.LocalTime `json:"created_at"`
+	UpdatedAt helper.LocalTime `json:"updated_at"`
 }
 
-func SearchUsers(repo user.Core) SearchUsersResponse {
+func SearchUsers(u user.Core) SearchUsersResponse {
 	return SearchUsersResponse{
-		ID:        repo.ID,
-		CreatedAt: repo.CreatedAt,
-		UpdatedAt: repo.UpdatedAt,
-		Name:      repo.Name,
-		Email:     repo.Email,
+		Username:  u.Username,
+		Phone:     u.Phone,
+		Email:     u.Email,
+		CreatedAt: helper.LocalTime(u.CreatedAt),
+		UpdatedAt: helper.LocalTime(u.UpdatedAt),
 	}
 }
 
 type ProfileResponse struct {
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	Username  string           `json:"username"`
+	Phone     string           `json:"phone"`
+	Email     string           `json:"email"`
+	CreatedAt helper.LocalTime `json:"created_at"`
+	UpdatedAt helper.LocalTime `json:"updated_at"`
 }
 
-func Profile(repo user.Core) ProfileResponse {
+func Profile(u user.Core) ProfileResponse {
 	return ProfileResponse{
-		CreatedAt: repo.CreatedAt,
-		UpdatedAt: repo.UpdatedAt,
-		Name:      repo.Name,
-		Email:     repo.Email,
+		Username:  u.Username,
+		Phone:     u.Phone,
+		Email:     u.Email,
+		CreatedAt: helper.LocalTime(u.CreatedAt),
+		UpdatedAt: helper.LocalTime(u.UpdatedAt),
 	}
-}
-
-type GetAllUsersResponse struct {
-	ID        uint           `json:"id"`
-	Name      string         `json:"name"`
-	Email     string         `json:"email"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	Books     []ResponseBook `json:"books"`
-}
-
-type ResponseBook struct {
-	Title     string    `json:"title"`
-	Author    string    `json:"author"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-}
-
-func GetAllUsers(user user.Core) GetAllUsersResponse {
-	response := GetAllUsersResponse{
-		ID:        user.ID,
-		Name:      user.Name,
-		Email:     user.Email,
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
-		Books:     make([]ResponseBook, len(user.Books)),
-	}
-
-	for i, book := range user.Books {
-		response.Books[i] = ResponseBook{
-			Title:     book.Title,
-			Author:    book.Author,
-			CreatedAt: book.CreatedAt,
-			UpdatedAt: book.UpdatedAt,
-		}
-	}
-
-	return response
 }

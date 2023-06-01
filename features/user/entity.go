@@ -3,20 +3,20 @@ package user
 import (
 	"time"
 
-	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/book"
 	"github.com/labstack/echo/v4"
 )
 
 type Core struct {
-	ID                uint
+	UserID            uint
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
-	Name              string
+	DeletedAt         time.Time
+	Username          string
+	Phone             string
 	Email             string
 	Password          string
 	NewPassword       string
 	ConfirmedPassword string
-	Books             []book.Core
 }
 
 type UserHandler interface {
@@ -26,7 +26,6 @@ type UserHandler interface {
 	SearchUsers() echo.HandlerFunc
 	UpdateProfile() echo.HandlerFunc
 	Deactive() echo.HandlerFunc
-	GetAllUsers() echo.HandlerFunc
 }
 
 type UserService interface {
@@ -36,7 +35,6 @@ type UserService interface {
 	SearchUsers(userId uint, pattern string) ([]Core, error)
 	UpdateProfile(userId uint, request Core) (Core, error)
 	Deactive(userId uint) (Core, error)
-	GetAllUserHasBooks() ([]Core, error)
 }
 
 type UserData interface {
@@ -46,5 +44,4 @@ type UserData interface {
 	SearchUsers(userId uint, pattern string) ([]Core, error)
 	UpdateProfile(userId uint, request Core) (Core, error)
 	Deactive(userId uint) (Core, error)
-	GetAllUserHasBooks() ([]Core, error)
 }

@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -9,13 +10,14 @@ import (
 )
 
 type Register struct {
-	Name     string `validate:"required"`
+	Username string `validate:"required"`
+	Phone    string `validate:"required"`
 	Email    string `validate:"required,email"`
 	Password string `validate:"required,strongPassword"`
 }
 
 type Login struct {
-	Name     string `validate:"required"`
+	Username string `validate:"required"`
 	Password string `validate:"required"`
 }
 
@@ -24,7 +26,8 @@ func UserValidate(option string, data interface{}) (interface{}, error) {
 	case "register":
 		res := Register{}
 		if v, ok := data.(user.Core); ok {
-			res.Name = v.Name
+			res.Username = v.Username
+			res.Phone = v.Phone
 			res.Email = v.Email
 			res.Password = v.Password
 		}
@@ -36,7 +39,7 @@ func UserValidate(option string, data interface{}) (interface{}, error) {
 	case "login":
 		res := Login{}
 		if v, ok := data.(Login); ok {
-			res.Name = v.Name
+			res.Username = v.Username
 			res.Password = v.Password
 		}
 		err := Authenticate(res)
@@ -66,7 +69,8 @@ func Authenticate(data interface{}) error {
 func UpdatePasswordValidator(password string) error {
 	minChars := strongPassword(password)
 	if minChars > 0 {
-		return fmt.Errorf("password strength is low, minimum %d characters need to be added", minChars)
+		fmt.Printf("password strength is low, minimum %d characters need to be added", minChars)
+		return errors.New("password strength is low")
 	}
 	return nil
 }

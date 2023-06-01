@@ -1,20 +1,24 @@
 package handler
 
-import "github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/user"
+import (
+	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/user"
+)
 
 type RegisterRequest struct {
-	Name     string `json:"name" form:"name"`
+	Username string `json:"username" form:"username"`
+	Phone    string `json:"phone" form:"phone"`
 	Email    string `json:"email" form:"email"`
 	Password string `json:"password" form:"password"`
 }
 
 type LoginRequest struct {
-	Name     string `json:"name" form:"name"`
+	Username string `json:"username" form:"username"`
 	Password string `json:"password" form:"password"`
 }
 
 type UpdateProfileRequest struct {
-	Name              *string `json:"name" form:"name"`
+	Username          *string `json:"username" form:"username"`
+	Phone             *string `json:"phone" form:"phone"`
 	Email             *string `json:"email" form:"email"`
 	Password          *string `json:"password" form:"password"`
 	NewPassword       *string `json:"new_password" form:"new_password"`
@@ -25,15 +29,16 @@ func RequestToCore(data interface{}) user.Core {
 	res := user.Core{}
 	switch v := data.(type) {
 	case RegisterRequest:
-		res.Name = v.Name
+		res.Username = v.Username
+		res.Phone = v.Phone
 		res.Email = v.Email
 		res.Password = v.Password
 	case LoginRequest:
-		res.Name = v.Name
+		res.Username = v.Username
 		res.Password = v.Password
 	case *UpdateProfileRequest:
-		if v.Name != nil {
-			res.Name = *v.Name
+		if v.Username != nil {
+			res.Username = *v.Username
 		}
 		if v.Email != nil {
 			res.Email = *v.Email

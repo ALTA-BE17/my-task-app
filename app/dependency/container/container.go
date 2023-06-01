@@ -1,19 +1,18 @@
 package container
 
 import (
-	"time"
+	"os"
 
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/app/config"
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/app/database"
-	bd "github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/book/data"
-	bh "github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/book/handler"
-	bs "github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/book/service"
 	ud "github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/user/data"
 	uh "github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/user/handler"
 	us "github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/user/service"
+	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/helper"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/dig"
 	"go.uber.org/zap"
+	"go.uber.org/zap/buffer"
 	"go.uber.org/zap/zapcore"
 )
 
@@ -42,15 +41,6 @@ func Run() {
 	if err := RegisterHandlerUser(App); err != nil {
 		panic(err)
 	}
-	if err := RegisterDataBook(App); err != nil {
-		panic(err)
-	}
-	if err := RegisterServiceBook(App); err != nil {
-		panic(err)
-	}
-	if err := RegisterHandlerBook(App); err != nil {
-		panic(err)
-	}
 }
 
 func RegisterDataUser(c *dig.Container) error {
@@ -74,36 +64,29 @@ func RegisterHandlerUser(c *dig.Container) error {
 	return nil
 }
 
-func RegisterDataBook(c *dig.Container) error {
-	if err := c.Provide(bd.New); err != nil {
-		return err
-	}
-	return nil
-}
-
-func RegisterServiceBook(c *dig.Container) error {
-	if err := c.Provide(bs.New); err != nil {
-		return err
-	}
-	return nil
-}
-
-func RegisterHandlerBook(c *dig.Container) error {
-	if err := c.Provide(bh.New); err != nil {
-		return err
-	}
-	return nil
-}
-
 func zapLogger() *zap.Logger {
-	config := zap.NewProductionConfig()
-	timeEncoder := func(t time.Time, e zapcore.PrimitiveArrayEncoder) {
-		e.AppendString(time.Now().UTC().Format("2006-01-02 15:04:05"))
+	production := false // Set this to true if running in production
+	cfg := helper.ZapGetConfig(production)
+
+	// constructing our prependEncoder with a ConsoleEncoder using your original configs
+	enc := &helper.PrependEncoder{
+		Encoder: zapcore.NewConsoleEncoder(cfg.EncoderConfig),
+		Pool:    buffer.NewPool(),
 	}
-	config.EncoderConfig.EncodeTime = timeEncoder
-	logger, err := config.Build()
-	if err != nil {
-		panic(err)
-	}
+
+	logger := zap.New(
+		zapcore.NewCore(
+			enc,
+			os.Stdout,
+			zapcore.DebugLevel,
+		),
+		// this mimics the behavior of NewProductionConfig.Build
+		zap.ErrorOutput(os.Stderr),
+	)
+
+	logger.Info("this is info")
+	logger.Debug("this is debug")
+	logger.Warn("this is warn")
+
 	return logger
 }

@@ -36,7 +36,7 @@ func (uh *UserHandler) Register() echo.HandlerFunc {
 		_, err := uh.Service.Register(RequestToCore(request))
 		if err != nil {
 			if strings.Contains(err.Error(), "empty") {
-				return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Username, email, and password cannot be empty.", nil))
+				return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Username, phone, email, and password cannot be empty.", nil))
 			}
 			if strings.Contains(err.Error(), "email") {
 				return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Invalid email format", nil))
@@ -183,27 +183,5 @@ func (uh *UserHandler) Deactive() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusCreated, "Successfully deleted an account", nil))
-	}
-}
-
-// GetAllUsers implements user.UserHandler
-func (uh *UserHandler) GetAllUsers() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		users, err := uh.Service.GetAllUserHasBooks()
-		if err != nil {
-			if strings.Contains(err.Error(), "users not found") {
-				return c.JSON(http.StatusNotFound, helper.ResponseFormat(http.StatusNotFound, "Error while retrieving list user.", nil))
-			}
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal server error.", nil))
-			}
-		}
-
-		result := make([]GetAllUsersResponse, len(users))
-		for i, user := range users {
-			result[i] = GetAllUsers(user)
-		}
-
-		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusOK, "Successfully operation.", result))
 	}
 }

@@ -1,55 +1,45 @@
 package data
 
 import (
-	bookCore "github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/book"
-	book "github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/book/data"
+	"time"
+
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/user"
 	"gorm.io/gorm"
 )
 
 type User struct {
-	gorm.Model
-	ID       uint        `gorm:"primaryKey; autoIncrement"`
-	Name     string      `gorm:"type:VARCHAR(100);not null;unique"`
-	Email    string      `gorm:"type:VARCHAR(100);not null;unique"`
-	Password string      `gorm:"type:VARCHAR(225);not null"`
-	Books    []book.Book `gorm:"foreignKey:UserID;references:ID;constraint:OnDelete:CASCADE"`
+	UserID    uint `gorm:"primaryKey; autoIncrement"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+	Username  string         `gorm:"type:VARCHAR(100);not null;unique"`
+	Phone     string         `gorm:"type:VARCHAR(15);not null;unique"`
+	Email     string         `gorm:"type:VARCHAR(100);not null;unique"`
+	Password  string         `gorm:"type:VARCHAR(225);not null"`
 }
 
 // User-model to user-core
-func userModels(repo User) user.Core {
+func userModels(u User) user.Core {
 	return user.Core{
-		ID:        repo.ID,
-		CreatedAt: repo.CreatedAt,
-		UpdatedAt: repo.UpdatedAt,
-		Name:      repo.Name,
-		Email:     repo.Email,
-		Password:  repo.Password,
-		Books:     make([]bookCore.Core, 0),
+		UserID:    u.UserID,
+		CreatedAt: u.CreatedAt,
+		UpdatedAt: u.UpdatedAt,
+		Username:  u.Username,
+		Phone:     u.Phone,
+		Email:     u.Email,
+		Password:  u.Password,
 	}
 }
 
 // User-core to user-model
-func userEntities(repo user.Core) User {
+func userEntities(u user.Core) User {
 	return User{
-		Model: gorm.Model{
-			ID:        repo.ID,
-			CreatedAt: repo.CreatedAt,
-			UpdatedAt: repo.UpdatedAt,
-		},
-		Name:     repo.Name,
-		Email:    repo.Email,
-		Password: repo.Password,
-	}
-}
-
-// Book-model to book-core
-func bookModels(repo book.Book) bookCore.Core {
-	return bookCore.Core{
-		ID:        repo.ID,
-		CreatedAt: repo.CreatedAt,
-		UpdatedAt: repo.UpdatedAt,
-		Title:     repo.Title,
-		Author:    repo.Author,
+		UserID:    u.UserID,
+		CreatedAt: u.CreatedAt,
+		UpdatedAt: u.UpdatedAt,
+		Username:  u.Username,
+		Phone:     u.Phone,
+		Email:     u.Email,
+		Password:  u.Password,
 	}
 }

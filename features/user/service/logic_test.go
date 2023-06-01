@@ -14,8 +14,8 @@ import (
 
 func TestUpdateProfile(t *testing.T) {
 	data := mocks.NewUserData(t)
-	usr := user.Core{ID: 1, Name: "admin", Email: "admin@gmail.com", Password: "HashedPassword1"}
-	request := user.Core{Name: "newName", Email: "newemail@gmail.com", Password: "HashedPassword1", NewPassword: "HashedPassword2", ConfirmedPassword: "HashedPassword2"}
+	usr := user.Core{UserID: 1, Username: "admin", Phone: "081235288543", Email: "admin@gmail.com", Password: "HashedPassword1"}
+	request := user.Core{Username: "newName", Phone: "081235288543", Email: "newemail@gmail.com", Password: "HashedPassword1", NewPassword: "HashedPassword2", ConfirmedPassword: "HashedPassword2"}
 	service := New(data)
 
 	t.Run("name, email, and password cannot be empty", func(t *testing.T) {
@@ -91,11 +91,28 @@ func TestUpdateProfile(t *testing.T) {
 		data.AssertExpectations(t)
 	})
 
-	t.Run("internal server error, failed to update account", func(t *testing.T) {
-		data.On("UpdateProfile", uint(1)).Return(user.Core{}, errors.New("internal server error, failed to update account")).Once()
-		_, err := service.UpdateProfile(uint(1), request)
+	t.Run("failed to update user, duplicate data entry", func(t *testing.T) {
+		data.On("Profile", uint(1)).Return(usr, nil)
+		data.On("UpdateProfile", uint(1), usr).Return(user.Core{}, errors.New("failed to update user, duplicate data entry"))
+		_, err := service.UpdateProfile(uint(1), usr)
+		expectedErr := errors.New("failed to update user, duplicate data entry")
 		assert.NotNil(t, err)
-		assert.ErrorContains(t, err, "internal server error")
+		assert.EqualError(t, err, expectedErr.Error(), "Expected error message does not match")
+		data.AssertExpectations(t)
+	})
+
+	t.Run("internal server error, failed to update account", func(t *testing.T) {
+		expectedError := errors.New("internal server error, failed to update account")
+		userId := uint(1)
+		data.On("Profile", userId).Return(user.Core{}, nil).Once()
+		data.On("UpdateProfile", userId, usr).Return(user.Core{}, expectedError).Once()
+
+		result, err := service.UpdateProfile(userId, usr)
+
+		assert.Equal(t, user.Core{}, result)
+		assert.NotNil(t, err)
+		assert.EqualError(t, err, "internal server error, failed to update account")
+
 		data.AssertExpectations(t)
 	})
 }
@@ -103,7 +120,7 @@ func TestUpdateProfile(t *testing.T) {
 func BenchmarkSearchUsers(b *testing.B) {
 	data := mocks.NewUserData(b)
 	pattern := "admin"
-	result := []user.Core{{ID: 1, Name: "admin", Email: "admin@mail.com"}}
+	result := []user.Core{{UserID: 1, Username: "admin", Phone: "081235288543", Email: "admin@mail.com"}}
 	service := New(data)
 
 	data.On("SearchUsers", mock.AnythingOfType("uint"), pattern).Return(result, nil).Times(b.N)
@@ -120,7 +137,7 @@ func TestSearchUsers(t *testing.T) {
 	data := mocks.NewUserData(t)
 	pattern := "admin"
 	emptyPattern := ""
-	result := []user.Core{{ID: 1, Name: "admin", Email: "admin@mail.com"}}
+	result := []user.Core{{UserID: 1, Username: "admin", Phone: "081235288543", Email: "admin@mail.com"}}
 	service := New(data)
 
 	t.Run("failed to process the request due to empty param input", func(t *testing.T) {
@@ -160,7 +177,7 @@ func TestSearchUsers(t *testing.T) {
 
 func BenchmarkDeactive(b *testing.B) {
 	data := mocks.NewUserData(b)
-	result := user.Core{ID: 1, Name: "admin", Email: "admin@mail.com"}
+	result := user.Core{UserID: 1, Username: "admin", Phone: "081235288543", Email: "admin@mail.com"}
 	service := New(data)
 
 	b.ResetTimer()
@@ -174,7 +191,7 @@ func BenchmarkDeactive(b *testing.B) {
 
 func TestDeactive(t *testing.T) {
 	data := mocks.NewUserData(t)
-	result := user.Core{ID: 1, Name: "admin", Email: "admin@mail.com"}
+	result := user.Core{UserID: 1, Username: "admin", Phone: "081235288543", Email: "admin@mail.com"}
 	service := New(data)
 
 	t.Run("success deactivate an account", func(t *testing.T) {
@@ -205,7 +222,7 @@ func TestDeactive(t *testing.T) {
 
 func BenchmarkProfile(b *testing.B) {
 	data := mocks.NewUserData(b)
-	result := user.Core{ID: 1, Name: "admin", Email: "admin@mail.com"}
+	result := user.Core{UserID: 1, Username: "admin", Phone: "081235288543", Email: "admin@mail.com"}
 	service := New(data)
 
 	b.ResetTimer()
@@ -222,15 +239,20 @@ func BenchmarkProfile(b *testing.B) {
 
 func TestProfile(t *testing.T) {
 	data := mocks.NewUserData(t)
-	result := user.Core{ID: 1, Name: "admin", Email: "admin@mail.com"}
+	result := user.Core{
+		UserID:   1,
+		Username: "admin",
+		Phone:    "081235288543",
+		Email:    "admin@mail.com"}
 	service := New(data)
 
 	t.Run("success get profile", func(t *testing.T) {
 		data.On("Profile", uint(1)).Return(result, nil).Once()
 		res, err := service.Profile(uint(1))
 		assert.Nil(t, err)
-		assert.Equal(t, result.ID, res.ID)
-		assert.Equal(t, result.Name, res.Name)
+		assert.Equal(t, result.UserID, res.UserID)
+		assert.Equal(t, result.Username, res.Username)
+		assert.Equal(t, result.Phone, res.Phone)
 		assert.Equal(t, result.Email, res.Email)
 		data.AssertExpectations(t)
 	})
@@ -256,9 +278,9 @@ func TestProfile(t *testing.T) {
 
 func BenchmarkLogin(b *testing.B) {
 	data := mocks.NewUserData(b)
-	arguments := user.Core{Name: "grace", Password: "@SecretPassword123"}
+	arguments := user.Core{Username: "grace", Password: "@SecretPassword123"}
 	hashed, _ := helper.HashPassword(arguments.Password)
-	resultData := user.Core{ID: uint(1), Name: "grace", Password: hashed}
+	resultData := user.Core{UserID: uint(1), Username: "grace", Password: hashed}
 	service := New(data)
 
 	b.ResetTimer()
@@ -275,17 +297,17 @@ func BenchmarkLogin(b *testing.B) {
 
 func TestLogin(t *testing.T) {
 	data := mocks.NewUserData(t)
-	arguments := user.Core{Name: "admin", Password: "@SecretPassword123"}
-	wrongArguments := user.Core{Name: "admin", Password: "@WrongPassword"}
+	arguments := user.Core{Username: "admin", Password: "@SecretPassword123"}
+	wrongArguments := user.Core{Username: "admin", Password: "@WrongPassword"}
 	token := "123"
 	emptyToken := ""
 	hashed, _ := helper.HashPassword(arguments.Password)
-	result := user.Core{ID: uint(1), Name: "admin", Password: hashed}
+	result := user.Core{UserID: uint(1), Username: "admin", Password: hashed}
 	service := New(data)
 
 	t.Run("username and password cannot be empty", func(t *testing.T) {
 		request := user.Core{
-			Name:     "",
+			Username: "",
 			Password: "",
 		}
 
@@ -301,7 +323,7 @@ func TestLogin(t *testing.T) {
 		res, token, err := service.Login(arguments)
 		assert.Nil(t, err)
 		assert.NotEmpty(t, token)
-		assert.Equal(t, result.Name, res.Name)
+		assert.Equal(t, result.Username, res.Username)
 		data.AssertExpectations(t)
 	})
 
@@ -317,7 +339,7 @@ func TestLogin(t *testing.T) {
 		data.On("Login", mock.Anything).Return(user.Core{}, emptyToken, errors.New("server error")).Once()
 		res, token, err := service.Login(arguments)
 		assert.NotNil(t, err)
-		assert.Equal(t, uint(0), res.ID)
+		assert.Equal(t, uint(0), res.UserID)
 		assert.Equal(t, emptyToken, token)
 		assert.ErrorContains(t, err, "internal server error")
 		data.AssertExpectations(t)
@@ -326,8 +348,13 @@ func TestLogin(t *testing.T) {
 
 func BenchmarkRegister(b *testing.B) {
 	data := mocks.NewUserData(b)
-	arguments := user.Core{Name: "admin", Email: "admin@gmail.com", Password: "@SecretPassword123"}
-	resultData := user.Core{ID: uint(1), Name: "admin", Email: "admin@gmail.com"}
+	arguments := user.Core{
+		Username: "admin",
+		Phone:    "081235288543",
+		Email:    "admin@gmail.com",
+		Password: "@S3#cr3tP4ss#word123",
+	}
+	resultData := user.Core{UserID: uint(1), Username: "admin", Phone: "081235288543", Email: "admin@gmail.com"}
 	service := New(data)
 
 	b.ResetTimer()
@@ -344,18 +371,24 @@ func BenchmarkRegister(b *testing.B) {
 
 func TestRegister(t *testing.T) {
 	data := mocks.NewUserData(t)
-	arguments := user.Core{Name: "admin", Email: "admin@gmail.com", Password: "@SecretPassword123"}
-	result := user.Core{ID: uint(1), Name: "admin", Email: "admin@gmail.com"}
+	arguments := user.Core{
+		Username: "admin",
+		Phone:    "081235288543",
+		Email:    "admin@gmail.com",
+		Password: "@S3#cr3tP4ss#word123",
+	}
+	result := user.Core{UserID: uint(1), Username: "admin", Phone: "081235288543", Email: "admin@gmail.com"}
 	service := New(data)
 
-	t.Run("username, email, and password cannot be empty", func(t *testing.T) {
+	t.Run("request cannot be empty", func(t *testing.T) {
 		request := user.Core{
-			Name:     "admin",
+			Username: "admin",
+			Phone:    "081235288543",
 			Email:    "",
 			Password: "",
 		}
 		_, err := service.Register(request)
-		expectedErr := errors.New("username, email, and password cannot be empty")
+		expectedErr := errors.New("request cannot be empty")
 		assert.NotNil(t, err)
 		assert.EqualError(t, err, expectedErr.Error(), "Expected error message does not match")
 		data.AssertExpectations(t)
@@ -363,7 +396,8 @@ func TestRegister(t *testing.T) {
 
 	t.Run("field validation for password", func(t *testing.T) {
 		request := user.Core{
-			Name:     "admin",
+			Username: "admin",
+			Phone:    "081235288543",
 			Email:    "admin@gmail.com",
 			Password: "",
 		}
@@ -376,9 +410,25 @@ func TestRegister(t *testing.T) {
 		data.AssertExpectations(t)
 	})
 
+	t.Run("invalid email format", func(t *testing.T) {
+		request := user.Core{
+			Username: "admin",
+			Phone:    "081235288543",
+			Email:    "admin.mail.com",
+			Password: "@S3#cr3tP4ss#word123",
+		}
+
+		_, err := service.Register(request)
+
+		expectedError := errors.New("invalid email format")
+		assert.EqualError(t, err, expectedError.Error(), "Expected error message does not match")
+		data.AssertExpectations(t)
+	})
+
 	t.Run("check password strength, low password", func(t *testing.T) {
 		request := user.Core{
-			Name:     "admin",
+			Username: "admin",
+			Phone:    "081235288543",
 			Email:    "admin@gmail.com",
 			Password: "123",
 		}
@@ -394,8 +444,10 @@ func TestRegister(t *testing.T) {
 		data.On("Register", mock.Anything).Return(result, nil).Once()
 		res, err := service.Register(arguments)
 		assert.Nil(t, err)
-		assert.Equal(t, result.ID, res.ID)
-		assert.NotEmpty(t, result.Name)
+		assert.Equal(t, result.UserID, res.UserID)
+		assert.NotEmpty(t, result.Username)
+		assert.NotEmpty(t, result.Phone)
+		assert.NotEmpty(t, result.Email)
 		data.AssertExpectations(t)
 	})
 
@@ -403,7 +455,7 @@ func TestRegister(t *testing.T) {
 		data.On("Register", mock.Anything).Return(user.Core{}, errors.New("data already used, duplicated")).Once()
 		res, err := service.Register(arguments)
 		assert.NotNil(t, err)
-		assert.Equal(t, uint(0), res.ID)
+		assert.Equal(t, uint(0), res.UserID)
 		assert.ErrorContains(t, err, "duplicated")
 		data.AssertExpectations(t)
 	})
@@ -412,7 +464,7 @@ func TestRegister(t *testing.T) {
 		data.On("Register", mock.Anything).Return(user.Core{}, errors.New("server error")).Once()
 		res, err := service.Register(arguments)
 		assert.NotNil(t, err)
-		assert.Equal(t, uint(0), res.ID)
+		assert.Equal(t, uint(0), res.UserID)
 		assert.ErrorContains(t, err, "internal server error")
 		data.AssertExpectations(t)
 	})

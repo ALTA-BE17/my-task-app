@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"log"
 	"strings"
 
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/user"
@@ -21,8 +20,8 @@ func New(ud user.UserData) user.UserService {
 }
 
 func (s *Service) Register(request user.Core) (user.Core, error) {
-	if request.Name == "" || request.Email == "" || request.Password == "" {
-		return user.Core{}, errors.New("username, email, and password cannot be empty")
+	if request.Username == "" || request.Phone == "" || request.Email == "" || request.Password == "" {
+		return user.Core{}, errors.New("request cannot be empty")
 	}
 
 	_, err := validation.UserValidate("register", request)
@@ -48,7 +47,7 @@ func (s *Service) Register(request user.Core) (user.Core, error) {
 }
 
 func (s *Service) Login(request user.Core) (user.Core, string, error) {
-	if request.Name == "" || request.Password == "" {
+	if request.Username == "" || request.Password == "" {
 		return user.Core{}, "", errors.New("username and password cannot be empty")
 	}
 
@@ -101,14 +100,14 @@ func (s *Service) UpdateProfile(userId uint, request user.Core) (user.Core, erro
 		}
 
 		usr, err := s.query.Profile(userId)
-		log.Println(usr)
 		if err != nil {
-			return user.Core{}, err
+			if strings.Contains(err.Error(), "error while retrieving user profile") {
+				return user.Core{}, errors.New("error while retrieving user profile")
+			}
 		}
 
-		match1 := helper.MatchPassword(request.Password, usr.Password)
-		log.Printf("match: %v", match1)
-		if !match1 {
+		match := helper.MatchPassword(request.Password, usr.Password)
+		if !match {
 			return user.Core{}, errors.New("old password and current password do not match")
 		}
 
@@ -121,25 +120,14 @@ func (s *Service) UpdateProfile(userId uint, request user.Core) (user.Core, erro
 		if err != nil {
 			return user.Core{}, errors.New("password strength is low")
 		}
-
-		hash, err := helper.HashPassword(request.NewPassword)
-		if err != nil {
-			return user.Core{}, errors.New("error while hashing new password")
-		}
-
-		log.Printf("berhasil hashing new password: %s", hash)
-		request.Password = hash
 	}
 
-	if request.Name == "" && request.Email == "" && request.Password == "" {
+	if request.Username == "" && request.Phone == "" && request.Email == "" && request.Password == "" {
 		return user.Core{}, errors.New("failed to process the request due to empty input")
 	}
 
 	result, err := s.query.UpdateProfile(userId, request)
 	if err != nil {
-		if strings.Contains(err.Error(), "error while retrieving user profile") {
-			return user.Core{}, errors.New("error while retrieving user profile")
-		}
 		if strings.Contains(err.Error(), "failed to update user, duplicate data entry") {
 			return user.Core{}, errors.New("failed to update user, duplicate data entry")
 		}
@@ -158,18 +146,5 @@ func (s *Service) Deactive(userId uint) (user.Core, error) {
 		return user.Core{}, errors.New("internal server error, failed to delete account")
 	}
 
-	return result, nil
-}
-
-// GetAllUsers implements user.UserService
-func (s *Service) GetAllUserHasBooks() ([]user.Core, error) {
-	result, err := s.query.GetAllUserHasBooks()
-	if err != nil {
-		if strings.Contains(err.Error(), "not found") {
-			return []user.Core{}, errors.New("not found, error while retrieving list users")
-		} else {
-			return []user.Core{}, errors.New("internal server error")
-		}
-	}
 	return result, nil
 }

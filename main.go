@@ -21,7 +21,7 @@ func main() {
 		signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 		r.RegisterRoutes()
 		go func() {
-			if err := d.Echo.Start(":80"); err != nil {
+			if err := d.Echo.Start(":8080"); err != nil {
 				d.Logger.Panic("Failed to start server")
 				sigChan <- syscall.SIGTERM
 			}
