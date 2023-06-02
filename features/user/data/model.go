@@ -9,7 +9,7 @@ import (
 )
 
 type User struct {
-	UserID    string `gorm:"type:varchar(50);primaryKey"`
+	UserID    string `gorm:"type:varchar(100);primaryKey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
