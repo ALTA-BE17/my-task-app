@@ -9,14 +9,14 @@ import (
 )
 
 type User struct {
-	UserID    string `gorm:"type:VARCHAR(50);primaryKey"`
+	UserID    string `gorm:"type:varchar(50);primaryKey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
-	Username  string         `gorm:"type:VARCHAR(100);not null;unique"`
-	Phone     string         `gorm:"type:VARCHAR(15);not null;unique"`
-	Email     string         `gorm:"type:VARCHAR(100);not null;unique"`
-	Password  string         `gorm:"type:VARCHAR(225);not null"`
+	Username  string         `gorm:"type:varchar(100);not null;unique"`
+	Phone     string         `gorm:"type:varchar(15);not null;unique"`
+	Email     string         `gorm:"type:varchar(100);not null;unique"`
+	Password  string         `gorm:"type:varchar(225);not null"`
 }
 
 // User-model to user-core
