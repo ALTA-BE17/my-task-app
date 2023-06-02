@@ -5,6 +5,9 @@ import (
 
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/app/config"
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/app/database"
+	ph "github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/project/data"
+	pd "github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/project/handler"
+	ps "github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/project/service"
 	ud "github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/user/data"
 	uh "github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/user/handler"
 	us "github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/user/service"
@@ -41,6 +44,15 @@ func Run() {
 	if err := RegisterHandlerUser(App); err != nil {
 		panic(err)
 	}
+	if err := RegisterDataProject(App); err != nil {
+		panic(err)
+	}
+	if err := RegisterServiceProject(App); err != nil {
+		panic(err)
+	}
+	if err := RegisterHandlerProject(App); err != nil {
+		panic(err)
+	}
 }
 
 func RegisterDataUser(c *dig.Container) error {
@@ -59,6 +71,27 @@ func RegisterServiceUser(c *dig.Container) error {
 
 func RegisterHandlerUser(c *dig.Container) error {
 	if err := c.Provide(uh.New); err != nil {
+		return err
+	}
+	return nil
+}
+
+func RegisterDataProject(c *dig.Container) error {
+	if err := c.Provide(pd.New); err != nil {
+		return err
+	}
+	return nil
+}
+
+func RegisterServiceProject(c *dig.Container) error {
+	if err := c.Provide(ps.New); err != nil {
+		return err
+	}
+	return nil
+}
+
+func RegisterHandlerProject(c *dig.Container) error {
+	if err := c.Provide(ph.New); err != nil {
 		return err
 	}
 	return nil

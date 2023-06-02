@@ -11,7 +11,7 @@ type Task struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   gorm.DeletedAt `gorm:"index"`
-	Name        string
+	Name        string         `gorm:"size:50;not null;unique"`
 	Description string
 	Status      string `gorm:"not null;type:enum('Completed', 'Not Completed'); default:'Not Completed'"`
 	ProjectID   string
