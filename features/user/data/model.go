@@ -3,6 +3,7 @@ package data
 import (
 	"time"
 
+	project "github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/project/data"
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/user"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -12,11 +13,12 @@ type User struct {
 	UserID    string `gorm:"type:varchar(100);primaryKey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
-	Username  string         `gorm:"type:varchar(100);not null;unique"`
-	Phone     string         `gorm:"type:varchar(15);not null;unique"`
-	Email     string         `gorm:"type:varchar(100);not null;unique"`
-	Password  string         `gorm:"type:varchar(225);not null"`
+	DeletedAt gorm.DeletedAt    `gorm:"index"`
+	Username  string            `gorm:"type:varchar(100);not null;unique"`
+	Phone     string            `gorm:"type:varchar(15);not null;unique"`
+	Email     string            `gorm:"type:varchar(100);not null;unique"`
+	Password  string            `gorm:"type:varchar(225);not null"`
+	Projects  []project.Project `gorm:"foreignKey:UserID;references:UserID; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 // User-model to user-core
