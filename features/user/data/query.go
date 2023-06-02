@@ -66,7 +66,7 @@ func (q *Query) Login(request user.Core) (user.Core, string, error) {
 		return user.Core{}, "", errors.New("password does not match")
 	}
 
-	token, err := middlewares.CreateToken(int(result.UserID))
+	token, err := middlewares.CreateToken((result.UserID))
 	if err != nil {
 		q.dep.Logger.Warn("error while creating jwt token", zap.Error(err))
 		return user.Core{}, "", errors.New("internal server error")
@@ -76,7 +76,7 @@ func (q *Query) Login(request user.Core) (user.Core, string, error) {
 	return userModels(result), token, nil
 }
 
-func (q *Query) Profile(userId uint) (user.Core, error) {
+func (q *Query) Profile(userId string) (user.Core, error) {
 	userModel := User{}
 	query := q.dep.DB.Raw("SELECT * FROM users WHERE user_id = ? AND deleted_at IS NULL", userId).Scan(&userModel)
 	if errors.Is(query.Error, gorm.ErrRecordNotFound) {
@@ -88,7 +88,7 @@ func (q *Query) Profile(userId uint) (user.Core, error) {
 	return userModels(userModel), nil
 }
 
-func (q *Query) SearchUsers(userId uint, pattern string) ([]user.Core, error) {
+func (q *Query) SearchUsers(userId string, pattern string) ([]user.Core, error) {
 	users := []User{}
 	query := q.dep.DB.Raw("SELECT * FROM users WHERE username OR email LIKE ? AND deleted_at IS NULL;", "%"+pattern+"%").Scan(&users)
 	if errors.Is(query.Error, gorm.ErrRecordNotFound) {
@@ -108,7 +108,7 @@ func (q *Query) SearchUsers(userId uint, pattern string) ([]user.Core, error) {
 	return res, nil
 }
 
-func (q *Query) UpdateProfile(userId uint, request user.Core) (user.Core, error) {
+func (q *Query) UpdateProfile(userId string, request user.Core) (user.Core, error) {
 	result := User{}
 	hashed, errHash := helper.HashPassword(request.Password)
 	if errHash != nil {
@@ -119,7 +119,7 @@ func (q *Query) UpdateProfile(userId uint, request user.Core) (user.Core, error)
 	request.Password = hashed
 	req := userEntities(request)
 
-	log.Printf("berhasil hashing new password: %s", hashed)
+	log.Printf("success hashing new password: %s", hashed)
 
 	query := q.dep.DB.Table("users").Where("user_id = ? AND deleted_at IS NULL", userId).Updates(&req)
 	if errors.Is(query.Error, gorm.ErrRecordNotFound) {
@@ -144,7 +144,7 @@ func (q *Query) UpdateProfile(userId uint, request user.Core) (user.Core, error)
 	return userModels(result), nil
 }
 
-func (q *Query) Deactive(userId uint) (user.Core, error) {
+func (q *Query) Deactive(userId string) (user.Core, error) {
 	userModel := User{}
 	query := q.dep.DB.Table("users").Where("user_id = ? AND deleted_at IS NULL", userId).Delete(&userModel)
 	if errors.Is(query.Error, gorm.ErrRecordNotFound) {

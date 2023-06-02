@@ -7,7 +7,7 @@ import (
 )
 
 type Core struct {
-	UserID            uint
+	UserID            string
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
 	DeletedAt         time.Time
@@ -31,17 +31,17 @@ type UserHandler interface {
 type UserService interface {
 	Register(request Core) (Core, error)
 	Login(request Core) (Core, string, error)
-	Profile(userId uint) (Core, error)
-	SearchUsers(userId uint, pattern string) ([]Core, error)
-	UpdateProfile(userId uint, request Core) (Core, error)
-	Deactive(userId uint) (Core, error)
+	Profile(userId string) (Core, error)
+	SearchUsers(userId string, pattern string) ([]Core, error)
+	UpdateProfile(userId string, request Core) (Core, error)
+	Deactive(userId string) (Core, error)
 }
 
 type UserData interface {
 	Register(request Core) (Core, error)
 	Login(request Core) (Core, string, error)
-	Profile(userId uint) (Core, error)
-	SearchUsers(userId uint, pattern string) ([]Core, error)
-	UpdateProfile(userId uint, request Core) (Core, error)
-	Deactive(userId uint) (Core, error)
+	Profile(userId string) (Core, error)
+	SearchUsers(userId string, pattern string) ([]Core, error)
+	UpdateProfile(userId string, request Core) (Core, error)
+	Deactive(userId string) (Core, error)
 }

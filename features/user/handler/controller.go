@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/app/dependency"
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/user"
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/helper"
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/middlewares"
@@ -15,13 +14,11 @@ import (
 type UserHandler struct {
 	dig.In
 	Service user.UserService
-	Dep     dependency.Dependency
 }
 
-func New(srv user.UserService, dep dependency.Dependency) user.UserHandler {
+func New(srv user.UserService) user.UserHandler {
 	return &UserHandler{
 		Service: srv,
-		Dep:     dep,
 	}
 }
 

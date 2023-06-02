@@ -4,11 +4,12 @@ import (
 	"time"
 
 	"github.com/ALTA-BE17/Rest-API-Clean-Arch-Test/features/user"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type User struct {
-	UserID    uint `gorm:"primaryKey; autoIncrement"`
+	UserID    string `gorm:"type:VARCHAR(50);primaryKey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
@@ -20,8 +21,9 @@ type User struct {
 
 // User-model to user-core
 func userModels(u User) user.Core {
+	User_ID, _ := uuid.NewUUID()
 	return user.Core{
-		UserID:    u.UserID,
+		UserID:    User_ID.String(),
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
 		Username:  u.Username,
@@ -33,8 +35,9 @@ func userModels(u User) user.Core {
 
 // User-core to user-model
 func userEntities(u user.Core) User {
+	User_ID, _ := uuid.NewUUID()
 	return User{
-		UserID:    u.UserID,
+		UserID:    User_ID.String(),
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
 		Username:  u.Username,

@@ -65,7 +65,7 @@ func (s *Service) Login(request user.Core) (user.Core, string, error) {
 	return result, token, nil
 }
 
-func (s *Service) Profile(userId uint) (user.Core, error) {
+func (s *Service) Profile(userId string) (user.Core, error) {
 	result, err := s.query.Profile(userId)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found, error while retrieving user profile") {
@@ -77,7 +77,7 @@ func (s *Service) Profile(userId uint) (user.Core, error) {
 	return result, nil
 }
 
-func (s *Service) SearchUsers(userId uint, pattern string) ([]user.Core, error) {
+func (s *Service) SearchUsers(userId string, pattern string) ([]user.Core, error) {
 	if pattern == "" {
 		return []user.Core{}, errors.New("failed to process the request due to empty param input")
 	}
@@ -93,7 +93,7 @@ func (s *Service) SearchUsers(userId uint, pattern string) ([]user.Core, error) 
 	return result, nil
 }
 
-func (s *Service) UpdateProfile(userId uint, request user.Core) (user.Core, error) {
+func (s *Service) UpdateProfile(userId string, request user.Core) (user.Core, error) {
 	if request.Password != "" || request.NewPassword != "" || request.ConfirmedPassword != "" {
 		if request.Password == "" || request.NewPassword == "" || request.ConfirmedPassword == "" {
 			return user.Core{}, errors.New("it's not a complete request for updating the password")
@@ -137,7 +137,7 @@ func (s *Service) UpdateProfile(userId uint, request user.Core) (user.Core, erro
 	return result, nil
 }
 
-func (s *Service) Deactive(userId uint) (user.Core, error) {
+func (s *Service) Deactive(userId string) (user.Core, error) {
 	result, err := s.query.Deactive(userId)
 	if err != nil {
 		if strings.Contains("error while retrieving user profile", err.Error()) {

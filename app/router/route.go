@@ -25,8 +25,8 @@ func (r *Routes) RegisterRoutes() {
 
 	e.POST("/register", r.User.Register())
 	e.POST("/login", r.User.Login())
-	e.GET("/users", r.User.Profile(), jwt.JWT([]byte(config.JWTSecret)))
-	e.GET("/users/search", r.User.SearchUsers(), jwt.JWT([]byte(config.JWTSecret)))
-	e.PUT("/users", r.User.UpdateProfile(), jwt.JWT([]byte(config.JWTSecret)))
-	e.DELETE("/users", r.User.Deactive(), jwt.JWT([]byte(config.JWTSecret)))
+	e.GET("/users", r.User.Profile(), jwt.JWT([]byte(config.JWTSECRET)))
+	e.GET("/users/search", r.User.SearchUsers(), jwt.JWT([]byte(config.JWTSECRET)))
+	e.PUT("/users", r.User.UpdateProfile(), jwt.JWT([]byte(config.JWTSECRET)))
+	e.DELETE("/users", r.User.Deactive(), jwt.JWT([]byte(config.JWTSECRET)))
 }

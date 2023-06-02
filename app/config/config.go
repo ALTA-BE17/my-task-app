@@ -9,16 +9,15 @@ import (
 )
 
 var (
-	Port      int
-	JWTSecret string
+	JWTSECRET string
 )
 
 type AppConfig struct {
-	DB_USERNAME string
-	DB_PASSWORD string
-	DB_HOST     string
-	DB_PORT     int
-	DB_NAME     string
+	DBUSERNAME string
+	DBPASSWORD string
+	DBHOST     string
+	DBPORT     int
+	DBNAME     string
 }
 
 func InitConfig() (*AppConfig, error) {
@@ -29,40 +28,32 @@ func readConfig() (*AppConfig, error) {
 	app := AppConfig{}
 	isRead := true
 
-	if val, found := os.LookupEnv("port"); found {
+	if val, found := os.LookupEnv("DBUSERNAME"); found {
+		app.DBUSERNAME = val
+		isRead = false
+	}
+	if val, found := os.LookupEnv("DBPASSWORD"); found {
+		app.DBPASSWORD = val
+		isRead = false
+	}
+	if val, found := os.LookupEnv("DBHOST"); found {
+		app.DBHOST = val
+		isRead = false
+	}
+	if val, found := os.LookupEnv("DBPORT"); found {
 		cnv, err := strconv.Atoi(val)
 		if err != nil {
 			return nil, err
 		}
-		Port = cnv
+		app.DBPORT = cnv
 		isRead = false
 	}
-	if val, found := os.LookupEnv("dbusername"); found {
-		app.DB_USERNAME = val
+	if val, found := os.LookupEnv("DBNAME"); found {
+		app.DBNAME = val
 		isRead = false
 	}
-	if val, found := os.LookupEnv("dbpassword"); found {
-		app.DB_PASSWORD = val
-		isRead = false
-	}
-	if val, found := os.LookupEnv("dbhost"); found {
-		app.DB_HOST = val
-		isRead = false
-	}
-	if val, found := os.LookupEnv("dbport"); found {
-		cnv, err := strconv.Atoi(val)
-		if err != nil {
-			return nil, err
-		}
-		app.DB_PORT = cnv
-		isRead = false
-	}
-	if val, found := os.LookupEnv("dbname"); found {
-		app.DB_NAME = val
-		isRead = false
-	}
-	if val, found := os.LookupEnv("jwtsecret"); found {
-		JWTSecret = val
+	if val, found := os.LookupEnv("JWTSECRET"); found {
+		JWTSECRET = val
 		isRead = false
 	}
 
@@ -77,13 +68,12 @@ func readConfig() (*AppConfig, error) {
 			return nil, err
 		}
 
-		Port = viper.GetInt("port")
-		app.DB_USERNAME = viper.GetString("dbusername")
-		app.DB_PASSWORD = viper.GetString("dbpassword")
-		app.DB_HOST = viper.GetString("dbhost")
-		app.DB_PORT = viper.GetInt("dbport")
-		app.DB_NAME = viper.GetString("dbname")
-		JWTSecret = viper.GetString("jwtsecret")
+		app.DBUSERNAME = viper.GetString("DBUSERNAME")
+		app.DBPASSWORD = viper.GetString("DBPASSWORD")
+		app.DBHOST = viper.GetString("DBHOST")
+		app.DBPORT = viper.GetInt("DBPORT")
+		app.DBNAME = viper.GetString("DBNAME")
+		JWTSECRET = viper.GetString("JWTSECRET")
 	}
 	return &app, nil
 }

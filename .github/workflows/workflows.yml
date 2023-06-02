@@ -43,11 +43,4 @@ jobs:
           docker rm ${{ secrets.CNAME }}
           docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/be-app:latest
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/be-app:latest
-          docker run -d -p 80:80 \
-              -e dbusername=${{ secrets.DB_USERNAME }} \
-              -e dbpassword=${{ secrets.DB_PASSWORD }} \
-              -e dbhost=${{ secrets.DB_HOST }} \
-              -e dbport=${{ secrets.DB_PORT }} \
-              -e dbname=${{ secrets.DB_NAME }} \
-              -e jwtsecret=${{ secrets.JWT_SECRET }} \
-              ${{ secrets.DOCKERHUB_USERNAME }}/be-app:latest
+          docker run -d -p 8080:80 -e DBUSERNAME=${{ secrets.DBUSERNAME }} -e DBPASSWORD=${{ secrets.DBPASSWORD }} -e DBHOST=${{ secrets.DBHOST }} -e DBPORT=${{ secrets.DBPORT }} -e DBNAME=${{ secrets.DBNAME }} -e JWTSECRET=${{ secrets.JWTSECRET }} ${{ secrets.DOCKERHUB_USERNAME }}/be-app:latest

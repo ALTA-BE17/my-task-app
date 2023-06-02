@@ -10,8 +10,8 @@ import (
 
 type Dependency struct {
 	dig.In
-	DB     *gorm.DB
 	Config *config.AppConfig
-	Echo   *echo.Echo
 	Logger *zap.Logger
+	DB     *gorm.DB
+	Echo   *echo.Echo
 }

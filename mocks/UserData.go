@@ -13,21 +13,21 @@ type UserData struct {
 }
 
 // Deactive provides a mock function with given fields: userId
-func (_m *UserData) Deactive(userId uint) (user.Core, error) {
+func (_m *UserData) Deactive(userId string) (user.Core, error) {
 	ret := _m.Called(userId)
 
 	var r0 user.Core
 	var r1 error
-	if rf, ok := ret.Get(0).(func(uint) (user.Core, error)); ok {
+	if rf, ok := ret.Get(0).(func(string) (user.Core, error)); ok {
 		return rf(userId)
 	}
-	if rf, ok := ret.Get(0).(func(uint) user.Core); ok {
+	if rf, ok := ret.Get(0).(func(string) user.Core); ok {
 		r0 = rf(userId)
 	} else {
 		r0 = ret.Get(0).(user.Core)
 	}
 
-	if rf, ok := ret.Get(1).(func(uint) error); ok {
+	if rf, ok := ret.Get(1).(func(string) error); ok {
 		r1 = rf(userId)
 	} else {
 		r1 = ret.Error(1)
@@ -68,21 +68,21 @@ func (_m *UserData) Login(request user.Core) (user.Core, string, error) {
 }
 
 // Profile provides a mock function with given fields: userId
-func (_m *UserData) Profile(userId uint) (user.Core, error) {
+func (_m *UserData) Profile(userId string) (user.Core, error) {
 	ret := _m.Called(userId)
 
 	var r0 user.Core
 	var r1 error
-	if rf, ok := ret.Get(0).(func(uint) (user.Core, error)); ok {
+	if rf, ok := ret.Get(0).(func(string) (user.Core, error)); ok {
 		return rf(userId)
 	}
-	if rf, ok := ret.Get(0).(func(uint) user.Core); ok {
+	if rf, ok := ret.Get(0).(func(string) user.Core); ok {
 		r0 = rf(userId)
 	} else {
 		r0 = ret.Get(0).(user.Core)
 	}
 
-	if rf, ok := ret.Get(1).(func(uint) error); ok {
+	if rf, ok := ret.Get(1).(func(string) error); ok {
 		r1 = rf(userId)
 	} else {
 		r1 = ret.Error(1)
@@ -116,15 +116,15 @@ func (_m *UserData) Register(request user.Core) (user.Core, error) {
 }
 
 // SearchUsers provides a mock function with given fields: userId, pattern
-func (_m *UserData) SearchUsers(userId uint, pattern string) ([]user.Core, error) {
+func (_m *UserData) SearchUsers(userId string, pattern string) ([]user.Core, error) {
 	ret := _m.Called(userId, pattern)
 
 	var r0 []user.Core
 	var r1 error
-	if rf, ok := ret.Get(0).(func(uint, string) ([]user.Core, error)); ok {
+	if rf, ok := ret.Get(0).(func(string, string) ([]user.Core, error)); ok {
 		return rf(userId, pattern)
 	}
-	if rf, ok := ret.Get(0).(func(uint, string) []user.Core); ok {
+	if rf, ok := ret.Get(0).(func(string, string) []user.Core); ok {
 		r0 = rf(userId, pattern)
 	} else {
 		if ret.Get(0) != nil {
@@ -132,7 +132,7 @@ func (_m *UserData) SearchUsers(userId uint, pattern string) ([]user.Core, error
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(uint, string) error); ok {
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
 		r1 = rf(userId, pattern)
 	} else {
 		r1 = ret.Error(1)
@@ -142,21 +142,21 @@ func (_m *UserData) SearchUsers(userId uint, pattern string) ([]user.Core, error
 }
 
 // UpdateProfile provides a mock function with given fields: userId, request
-func (_m *UserData) UpdateProfile(userId uint, request user.Core) (user.Core, error) {
+func (_m *UserData) UpdateProfile(userId string, request user.Core) (user.Core, error) {
 	ret := _m.Called(userId, request)
 
 	var r0 user.Core
 	var r1 error
-	if rf, ok := ret.Get(0).(func(uint, user.Core) (user.Core, error)); ok {
+	if rf, ok := ret.Get(0).(func(string, user.Core) (user.Core, error)); ok {
 		return rf(userId, request)
 	}
-	if rf, ok := ret.Get(0).(func(uint, user.Core) user.Core); ok {
+	if rf, ok := ret.Get(0).(func(string, user.Core) user.Core); ok {
 		r0 = rf(userId, request)
 	} else {
 		r0 = ret.Get(0).(user.Core)
 	}
 
-	if rf, ok := ret.Get(1).(func(uint, user.Core) error); ok {
+	if rf, ok := ret.Get(1).(func(string, user.Core) error); ok {
 		r1 = rf(userId, request)
 	} else {
 		r1 = ret.Error(1)
